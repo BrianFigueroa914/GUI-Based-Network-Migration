@@ -1,4 +1,4 @@
-import Profiles from './profiles.jsx';
+import Profiles from './components/profiles.jsx';
 
 export default function App() {
   return (
