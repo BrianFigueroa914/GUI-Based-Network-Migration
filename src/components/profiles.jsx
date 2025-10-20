@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { addProfile, updateProfile, deleteProfile, subscribeProfiles } from '../firebase'
 
 function Profiles() {
   const [profiles, setProfiles] = useState([
@@ -10,11 +11,30 @@ function Profiles() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Sync selected profile fields from profiles list
     const p = profiles[selectedIndex];
     setName(p ? p.name : "");
     setIp(p ? p.ip : "");
     setError("");
   }, [selectedIndex, profiles]);
+
+  // Subscribe to Firestore profiles on mount
+  useEffect(() => {
+    const unsubscribe = subscribeProfiles((items) => {
+      // Map stored profiles to expected shape (name, ip). Keep createdAt for sorting.
+      const simplified = items.map((it) => ({ id: it.id, name: it.name || '', ip: it.ip || '' }))
+      if (simplified.length > 0) {
+        setProfiles(simplified)
+        // ensure selectedIndex stays in range
+        setSelectedIndex((idx) => Math.max(0, Math.min(idx, simplified.length - 1)))
+      } else {
+        setProfiles([])
+        setSelectedIndex(-1)
+      }
+    })
+
+    return () => unsubscribe()
+  }, [])
 
   function isValidIp(value) {
     const parts = value.split(".");
@@ -35,10 +55,23 @@ function Profiles() {
       setError("Invalid IP address.");
       return;
     }
-    const newProfiles = [...profiles, { name: name.trim(), ip: ip.trim() }];
-    setProfiles(newProfiles);
-    setSelectedIndex(newProfiles.length - 1);
-    setError("");
+    // Prevent creating a profile with a duplicate name (case-insensitive)
+    const newNameLower = name.trim().toLowerCase()
+    const exists = profiles.some((p) => (p.name || '').toLowerCase() === newNameLower)
+    if (exists) {
+      setError('Profile name already exists.')
+      return
+    }
+    // Persist to Firestore
+    addProfile({ name: name.trim(), ip: ip.trim() })
+      .then((id) => {
+        setError('')
+        // Firestore subscription will update local state; set selected index to last item once added
+      })
+      .catch((err) => {
+        console.error('Failed to add profile', err)
+        setError('Failed to save profile')
+      })
   }
 
   function handleUpdate() {
@@ -51,18 +84,32 @@ function Profiles() {
       setError("Invalid IP address.");
       return;
     }
-    const updated = profiles.map((p, i) => (i === selectedIndex ? { name: name.trim(), ip: ip.trim() } : p));
-    setProfiles(updated);
-    setError("");
+    const target = profiles[selectedIndex]
+    if (!target || !target.id) {
+      setError('Cannot update: missing profile id')
+      return
+    }
+    updateProfile(target.id, { name: name.trim(), ip: ip.trim() })
+      .then(() => setError(''))
+      .catch((err) => {
+        console.error('Update failed', err)
+        setError('Failed to update profile')
+      })
   }
 
   function handleDelete() {
     if (profiles.length === 0) return;
-    const next = profiles.filter((_, i) => i !== selectedIndex);
-    const nextIndex = Math.max(0, Math.min(next.length - 1, selectedIndex - 1));
-    setProfiles(next);
-    setSelectedIndex(next.length ? nextIndex : -1);
-    setError("");
+    const target = profiles[selectedIndex]
+    if (!target || !target.id) {
+      setError('Cannot delete: missing profile id')
+      return
+    }
+    deleteProfile(target.id)
+      .then(() => setError(''))
+      .catch((err) => {
+        console.error('Delete failed', err)
+        setError('Failed to delete profile')
+      })
   }
 
   return (
