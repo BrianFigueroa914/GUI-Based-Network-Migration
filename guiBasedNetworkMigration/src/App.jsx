@@ -1,19 +1,15 @@
 import Profiles from './components/profiles.jsx';
 
+
 export default function App() {
   return (
     <div className="app-shell">
-      <div className="header">
+      <header className="header" role="banner">
         <div className="brand">
           <h1>Network Migration Menu</h1>
-          <small>HCI prototype</small>
+          <small>Manage and store network profiles</small>
         </div>
-        <div className="right">
-          <a className="btn ghost" href="#" onClick={(e)=>e.preventDefault()} title="No real network changes are made">
-            Demo Mode
-          </a>
-        </div>
-      </div>
+      </header>
 
       <div className="card">
         <Profiles />
@@ -21,3 +17,4 @@ export default function App() {
     </div>
   );
 }
+
