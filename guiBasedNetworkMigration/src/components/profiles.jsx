@@ -210,7 +210,9 @@ export default function Profiles() {
         <div className="meta" style={{ marginBottom: 6 }}>
           <strong>Profiles</strong>
           <span>•</span>
-          <span>{filtered.length} of {profiles.length}</span>
+          <span>
+            {filtered.length} of {profiles.length}
+          </span>
         </div>
 
         <input
@@ -224,7 +226,9 @@ export default function Profiles() {
         {filtered.length === 0 ? (
           <div className="empty" role="status">
             {profiles.length === 0 ? (
-              <>No profiles yet. Click <strong>+ New</strong> to create one.</>
+              <>
+                No profiles yet. Click <strong>+ New</strong> to create one.
+              </>
             ) : (
               <>No matches for “{q}”.</>
             )}
@@ -243,12 +247,20 @@ export default function Profiles() {
                   aria-selected={isSel}
                   title={`${p.mode} on ${p.interface || "interface"}`}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <div>
                       <strong>{p.name}</strong>
                       <div className="muted" style={{ marginTop: 2 }}>
                         <span
-                          className={`badge ${p.mode === "DHCP" ? "success" : "warn"}`}
+                          className={`badge ${
+                            p.mode === "DHCP" ? "success" : "warn"
+                          }`}
                           style={{ marginRight: 6 }}
                         >
                           {p.mode}
@@ -264,15 +276,27 @@ export default function Profiles() {
         )}
 
         <div className="toolbar" role="toolbar" aria-label="Profile actions">
-          <button className="btn" onClick={addNew}>+ New</button>
-          <button className="btn secondary" onClick={exportJSON} disabled={profiles.length === 0}>
+          <button className="btn" onClick={addNew}>
+            + New
+          </button>
+          <button
+            className="btn secondary"
+            onClick={exportJSON}
+            disabled={profiles.length === 0}
+          >
             Export
           </button>
           <label className="btn secondary filebtn" aria-label="Import JSON">
             Import
-            <input type="file" accept="application/json" onChange={importJSON} />
+            <input
+              type="file"
+              accept="application/json"
+              onChange={importJSON}
+            />
           </label>
-          <button className="btn danger" onClick={remove} disabled={sel < 0}>Delete</button>
+          <button className="btn danger" onClick={remove} disabled={sel < 0}>
+            Delete
+          </button>
         </div>
       </div>
 
@@ -300,7 +324,9 @@ export default function Profiles() {
             <input
               className="input"
               value={draft.interface}
-              onChange={(e) => setDraft({ ...draft, interface: e.target.value })}
+              onChange={(e) =>
+                setDraft({ ...draft, interface: e.target.value })
+              }
               placeholder='e.g., "Ethernet" (Windows) or "eth0" (Linux)'
             />
             <div className="hint">Use the OS name of the adapter.</div>
@@ -318,7 +344,10 @@ export default function Profiles() {
               <option>DHCP</option>
               <option>Static</option>
             </select>
-            <div className="hint">DHCP receives IP automatically; Static requires manual values below.</div>
+            <div className="hint">
+              DHCP receives IP automatically; Static requires manual values
+              below.
+            </div>
           </label>
 
           {/* IP settings section (only for Static) */}
@@ -343,7 +372,9 @@ export default function Profiles() {
                 <input
                   className="input"
                   value={draft.subnet}
-                  onChange={(e) => setDraft({ ...draft, subnet: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, subnet: e.target.value })
+                  }
                   placeholder="255.255.255.0"
                 />
                 {errs.subnet && <em>{errs.subnet}</em>}
@@ -354,7 +385,9 @@ export default function Profiles() {
                 <input
                   className="input"
                   value={draft.gateway}
-                  onChange={(e) => setDraft({ ...draft, gateway: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, gateway: e.target.value })
+                  }
                   placeholder="192.168.1.1"
                 />
                 {errs.gateway && <em>{errs.gateway}</em>}
